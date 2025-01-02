@@ -45,7 +45,9 @@ services:
       - "8080:8080"
     command: "webserver"
     volumes:
-      - ./dags:/opt/airflow/dags  # Mount local DAGs directory
+      - ./dags:/opt/airflow/dags
+      - ./queries:/opt/aiflow/sql   
+      - ./tasks:/opt/airflow/tasks 
 
 
   airflow-scheduler:
@@ -72,7 +74,10 @@ services:
 
     command: "scheduler"
     volumes:
-      - ./dags:/opt/airflow/dags  # Mount local DAGs directory
+      - ./dags:/opt/airflow/dags
+      - ./queries:/opt/aiflow/sql   
+      - ./tasks:/opt/airflow/tasks
+      
 
 volumes:
   postgres_data:

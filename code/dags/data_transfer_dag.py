@@ -23,7 +23,7 @@ def replicate_table(table, columns):
 
 
 with DAG(
-    dag_id="transefer_postgres_mysql",
+    dag_id="transfer_postgres_mysql",
     start_date=datetime(2024, 12, 1),
     catchup=False,
     tags=["replication"],

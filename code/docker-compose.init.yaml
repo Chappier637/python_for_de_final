@@ -32,7 +32,9 @@ services:
         --role Admin \
         --email admin@example.com
     volumes:
-      - ./dags:/opt/airflow/dags  
+      - ./dags:/opt/airflow/dags
+      - ./queries:/opt/aiflow/sql   
+      - ./tasks:/opt/airflow/tasks
 
 volumes:
   postgres_data:
