@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  postgres-db:
+    container_name: postgres_db
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    ports:
+      - '5434:${PG_PORT}'
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - '${MYSQL_PORT}:3306'
+
+  airflow-webserver:
+    image: apache/airflow:2.7.2
+    container_name: airflow-webserver
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__WEBSERVER__SECRET_KEY: a1b2c3d4e5f6a7b8c9d0e1f2g3h4i5j6
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    ports:
+      - "8080:8080"
+    command: "webserver"
+    volumes:
+      - ./dags:/opt/airflow/dags  # Mount local DAGs directory
+
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.2
+    container_name: airflow-scheduler
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__WEBSERVER__SECRET_KEY: a1b2c3d4e5f6a7b8c9d0e1f2g3h4i5j6
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PORT: ${MYSQL_PORT}
+
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DB: ${PG_DB}
+      PG_HOST: ${PG_HOST}
+      PG_USER: ${PG_USER}
+      PG_PORT: ${PG_PORT}
+      AIRFLOW_CONN_POSTGRES_DEFAULT: "postgresql+psycopg2://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DB}"
+
+    command: "scheduler"
+    volumes:
+      - ./dags:/opt/airflow/dags  # Mount local DAGs directory
+
+volumes:
+  postgres_data:
+
+
+

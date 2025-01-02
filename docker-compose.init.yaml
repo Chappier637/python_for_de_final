@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  airflow-init:
+    image: apache/airflow:2.7.2
+    container_name: airflow-init
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__WEBSERVER__SECRET_KEY: a1b2c3d4e5f6a7b8c9d0e1f2g3h4i5j6
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    depends_on:
+      - postgres
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        airflow db init && \
+        airflow users create \
+        --username admin \
+        --password admin \
+        --firstname Admin \
+        --lastname User \
+        --role Admin \
+        --email admin@example.com
+    volumes:
+      - ./dags:/opt/airflow/dags  
+
+volumes:
+  postgres_data:
