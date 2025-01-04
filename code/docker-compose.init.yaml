@@ -12,7 +12,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   airflow-init:
-    image: apache/airflow:2.7.2
+    image: apache/airflow:2.10.4
     container_name: airflow-init
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -30,7 +30,25 @@ services:
         --firstname Admin \
         --lastname User \
         --role Admin \
-        --email admin@example.com
+        --email admin@example.com && \
+        airflow connections add 'pg' \
+        --conn-json '{ 
+            "conn_type": "postgres", 
+            "login": "'"$PG_USER"'", 
+            "password": "'"$PG_PASSWORD"'", 
+            "host": "'"$PG_HOST"'", 
+            "port": 5432, 
+            "schema": "'"$PG_DB"'" 
+        }' && \
+        airflow connections add 'mysql' \
+        --conn-json '{
+          "conn_type": "mysql",
+          "login": "'"$MYSQL_USER"'",
+          "password": "'"$MYSQL_PASSWORD"'",
+          "host": "'"$MYSQL_HOST"'",
+          "port": 3306,
+          "schema": "'"$MYSQL_DB"'"
+        }'
     volumes:
       - ./dags:/opt/airflow/dags
       - ./queries:/opt/aiflow/sql   

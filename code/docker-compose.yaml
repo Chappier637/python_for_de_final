@@ -1,3 +1,20 @@
+x-spark-common-env: &spark-common-env
+  SPARK_RPC_AUTHENTICATION_ENABLED: ${SPARK_RPC_AUTHENTICATION_ENABLED}
+  SPARK_RPC_ENCRYPTION_ENABLED: ${SPARK_RPC_ENCRYPTION_ENABLED}
+  SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: ${SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED}
+  SPARK_SSL_ENABLED: ${SPARK_SSL_ENABLED}
+
+x-mysql-common-env: &mysql-common-env
+  MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+  MYSQL_DATABASE: ${MYSQL_DB}
+  MYSQL_USER: ${MYSQL_USER}
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+x-pg-common-env: &pg-common-env
+  POSTGRES_USER: ${PG_USER}
+  POSTGRES_PASSWORD: ${PG_PASSWORD}
+  POSTGRES_DB: ${PG_DB}
+
 services:
   postgres:
     image: postgres:15
@@ -15,9 +32,7 @@ services:
     container_name: postgres_db
     image: postgres:15
     environment:
-      POSTGRES_USER: ${PG_USER}
-      POSTGRES_PASSWORD: ${PG_PASSWORD}
-      POSTGRES_DB: ${PG_DB}
+      <<: *pg-common-env
     ports:
       - '5434:${PG_PORT}'
 
@@ -25,15 +40,14 @@ services:
     image: mysql:8
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DB}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      <<: *mysql-common-env
     ports:
       - '${MYSQL_PORT}:3306'
+  
+  #airflow
 
   airflow-webserver:
-    image: apache/airflow:2.7.2
+    build: ./infra/airflow-webserver
     container_name: airflow-webserver
     depends_on:
       - postgres
@@ -51,36 +65,59 @@ services:
 
 
   airflow-scheduler:
-    image: apache/airflow:2.7.2
+    build: ./infra/airflow-scheduler
     container_name: airflow-scheduler
     depends_on:
       - postgres
     environment:
+      <<: *pg-common-env
+      <<: *mysql-common-env
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__WEBSERVER__SECRET_KEY: a1b2c3d4e5f6a7b8c9d0e1f2g3h4i5j6
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DB: ${MYSQL_DB}
+      
       MYSQL_HOST: ${MYSQL_HOST}
-      MYSQL_USER: ${MYSQL_USER}
       MYSQL_PORT: ${MYSQL_PORT}
 
-      PG_PASSWORD: ${PG_PASSWORD}
-      PG_DB: ${PG_DB}
       PG_HOST: ${PG_HOST}
-      PG_USER: ${PG_USER}
       PG_PORT: ${PG_PORT}
-      AIRFLOW_CONN_POSTGRES_DEFAULT: "postgresql+psycopg2://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DB}"
 
-    command: "scheduler"
+      AIRFLOW_CONN_POSTGRES_DEFAULT: "postgresql+psycopg2://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DB}"
+    restart: always
+    command: 
+      - scheduler
     volumes:
       - ./dags:/opt/airflow/dags
-      - ./queries:/opt/aiflow/sql   
+      - ./queries:/opt/airflow/sql   
       - ./tasks:/opt/airflow/tasks
       
+  spark-master:
+    image: bitnami/spark:latest
+    container_name: spark-master
+    environment:
+      <<: *spark-common-env
+      SPARK_MODE: master
+      SPARK_WEBUI_PORT: 8081
+    ports:
+      - "8081:8081"
+    volumes:
+      - spark-data:/bitmani
+
+  spark-worker:
+    image: bitnami/spark:latest
+    container_name: spark-worker
+    environment:
+      <<: *spark-common-env
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://${SPARK_MASTER_HOST}:${SPARK_MASTER_PORT}
+    volumes:
+      - spark-data:/bitmani
+    depends_on:
+      - spark-master
 
 volumes:
   postgres_data:
+  spark-data:
 
 
 

@@ -2,4 +2,4 @@ task_type: insert
 
 table: sales_analysis
 
-sql: /opt/airflow/dags/queries/data_mart.sql
+sql: /opt/airflow/sql/data_mart.sql
