@@ -18,9 +18,9 @@ logger_handler.setFormatter(formatter)
 mysql_conn_id = {
     "host": os.getenv("MYSQL_HOST"),
     "port": os.getenv("MYSQL_PORT"),
-    "user": os.getenv("MYSQL_USER"),
-    "password": os.getenv("MYSQL_PASSWORD"),
-    "dbname": os.getenv("MYSQL_DB"),
+    "user": 'airflow',
+    "password": 'airflow',
+    "dbname": 'airflow',
 }
 
 

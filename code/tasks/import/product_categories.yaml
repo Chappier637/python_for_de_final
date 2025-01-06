@@ -1,0 +1,7 @@
+task_type: import
+
+table: productCategories
+target_table: productCategories
+
+conn_id: pg
+target_conn_id: mysql

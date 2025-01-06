@@ -18,10 +18,10 @@ logger_handler.setFormatter(formatter)
 
 postgres_conn_id = {
     "host": os.getenv("PG_HOST"),
-    "port": os.getenv("PG_PORT"),
-    "user": os.getenv("PG_USER"),
-    "password": os.getenv("PG_PASSWORD"),
-    "dbname": os.getenv("PG_DB"),
+    "port": os.environ.get("PG_PORT"),
+    "user": "login",
+    "password": "pass",
+    "dbname": "ecommerce",
 }
 
 class PostgresAdapter:
@@ -32,9 +32,11 @@ class PostgresAdapter:
         self.PG_PWD = connection.get("password", "default_password")  
         self.PG_HOST = connection.get("host", "localhost")  
         self.PG_PORT = connection.get("port", 5432)  
-
+        self.conn_dwh = None
+        self.cursor_dwh = None
 
     def connect_cursor(self):
+        
         conn_dwh = psycopg2.connect(dbname=self.PG_DB,
                                     user=self.PG_USER,
                                     password=self.PG_PWD,
@@ -43,6 +45,8 @@ class PostgresAdapter:
                                     )
         self.cursor_dwh = conn_dwh.cursor()
         self.conn_dwh = conn_dwh
+        if self.cursor_dwh is None:
+            print('Connection error')
         return self.cursor_dwh
     
 
@@ -71,9 +75,6 @@ class PostgresAdapter:
         except Exception as e:
             logger.error(f"Error: {e}")
             sys.exit(1)
-        finally:
-            self.close_cursor()
-            self.close_connection()
 
 
     # Execute any custom query
@@ -92,6 +93,3 @@ class PostgresAdapter:
         except Exception as e:
             logger.error(f"Error: {e}")
             sys.exit(1)
-        finally:
-            self.close_cursor()
-            self.close_connection()

@@ -1,0 +1,7 @@
+task_type: import
+
+table: orderDetails
+target_table: orderDetails
+
+conn_id: pg
+target_conn_id: mysql

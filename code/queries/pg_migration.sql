@@ -3,7 +3,8 @@
 BEGIN;
 
 -- Create the Users table
-CREATE TABLE users (
+DROP TABLE IF EXISTS users CASCADE;
+CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
@@ -14,14 +15,16 @@ CREATE TABLE users (
 );
 
 -- Create the ProductCategories table
-CREATE TABLE productCategories (
+DROP TABLE IF EXISTS productCategories CASCADE;
+CREATE TABLE IF NOT EXISTS productCategories (
     category_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     parent_category_id INT REFERENCES ProductCategories(category_id)
 );
 
 -- Create the Products table
-CREATE TABLE products (
+DROP TABLE IF EXISTS products CASCADE;
+CREATE TABLE IF NOT EXISTS products (
     product_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
@@ -32,7 +35,8 @@ CREATE TABLE products (
 );
 
 -- Create the Orders table
-CREATE TABLE orders (
+DROP TABLE IF EXISTS orders CASCADE;
+CREATE TABLE IF NOT EXISTS orders (
     order_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES Users(user_id),
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -42,7 +46,8 @@ CREATE TABLE orders (
 );
 
 -- Create the OrderDetails table
-CREATE TABLE orderDetails (
+DROP TABLE IF EXISTS orderDetails CASCADE;
+CREATE TABLE IF NOT EXISTS orderDetails (
     order_detail_id SERIAL PRIMARY KEY,
     order_id INT REFERENCES Orders(order_id),
     product_id INT REFERENCES Products(product_id),

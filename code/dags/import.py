@@ -4,9 +4,9 @@ from utils.default_args import DEFAULT_ARGS
 from utils.gen_tasks import gen_tasks
 
 with DAG(
-    dag_id="data_marts",
+    dag_id="import",
     default_args=DEFAULT_ARGS,
-    tags=["data_marts"],
+    tags=["import"],
     catchup=False
 ) as dag:
-    gen_tasks(dag, 'marts')
+    gen_tasks(dag, 'import')

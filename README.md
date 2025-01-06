@@ -2,46 +2,23 @@
 
 ## Запуск
 
-### 1. Инициализация Airflow
+### Инициализация airflow
 
-Используйте `.env` файл или создайте переменные окружения другим способом.
-
-#### Список переменных окружения:
-```plaintext
-# PostgreSQL Credentials
-PG_USER=login
-PG_PASSWORD=pass
-PG_DB=ecommerce
-PG_HOST=postgres_db
-PG_PORT=5432
-
-# MySQL Credentials
-MYSQL_USER=airflow
-MYSQL_PASSWORD=airflow
-MYSQL_DB=airflow
-MYSQL_HOST=mysql
-MYSQL_PORT=3306
-```
-
-#### Шаги для инициализации Airflow:
-1. Убедитесь, что переменные окружения настроены.
-2. Выполните следующую команду для инициализации Airflow:
+Выполните следующую команду для инициализации Airflow:
    ```bash
    docker compose -f docker-compose.init.yaml -d up
    ```
 
-### 2. Поднятие сервисов Airflow, Postgres, MySQL
-Чтобы запустить необходимые сервисы, выполните:
+### Инициализация всего сервиса
+Выполните:
 ```bash
 docker compose up
 ```
-
 ---
 
 ## Airflow Dags
 
 ### Вход в Airflow
-Перейдите по адресу: [http://localhost:8080/](http://localhost:8080/).  
 Используйте следующие учетные данные для входа:
 - **Логин:** `admin`
 - **Пароль:** `admin`
@@ -54,17 +31,20 @@ docker compose up
   - Создание таблиц в Postgres и MySQL.
   - Загрузка первичных данных в Postgres.
 
-#### 2. **`transefer_postgres_mysql`**
+#### 2. **`import`**
 - Периодичность: **ежедневно**.
 - Функциональность:
-  - Репликация данных из Postgres в MySQL.
-- **Настройка таблиц и полей для репликации**:
-  - Содержится в файле `./dags/usecase/replicate_tables.yaml`.
+- Импорт таблиц из PG в MySQL
+
+- **Настройка таблиц для импорта**:
+  - Содержится в директории `code/tasks/import/`.
 
 #### 3. **`data_marts`**
 - Функциональность:
   - Построение аналитических витрин.
-
+- **Создание витрин**:
+  - Конфиги для задач лежат в `code/tasks/marts/`.
+  - SQL-скрипты для сборки лежат в `code/queries/marts`
 ---
 
 

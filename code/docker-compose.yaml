@@ -27,7 +27,8 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+      
+  #db
   postgres-db:
     container_name: postgres_db
     image: postgres:15
@@ -45,7 +46,6 @@ services:
       - '${MYSQL_PORT}:3306'
   
   #airflow
-
   airflow-webserver:
     build: ./infra/airflow-webserver
     container_name: airflow-webserver
@@ -90,7 +90,8 @@ services:
       - ./dags:/opt/airflow/dags
       - ./queries:/opt/airflow/sql   
       - ./tasks:/opt/airflow/tasks
-      
+
+  #spark
   spark-master:
     image: bitnami/spark:latest
     container_name: spark-master

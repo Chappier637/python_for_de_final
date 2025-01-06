@@ -1,5 +1,5 @@
 -- Create the Users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
@@ -10,14 +10,14 @@ CREATE TABLE users (
 );
 
 -- Create the ProductCategories table
-CREATE TABLE productCategories (
+CREATE TABLE IF NOT EXISTS productCategories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     parent_category_id INT
 );
 
 -- Create the Products table
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
@@ -28,7 +28,7 @@ CREATE TABLE products (
 );
 
 -- Create the Orders table
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -38,7 +38,7 @@ CREATE TABLE orders (
 );
 
 -- Create the OrderDetails table
-CREATE TABLE orderDetails (
+CREATE TABLE IF NOT EXISTS orderDetails (
     order_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
     product_id INT,
